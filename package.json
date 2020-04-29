@@ -1,0 +1,28 @@
+{
+  "name": "modbus-tcp-gateway",
+  "version": "0.0.1",
+  "description": "Modbus TCP server that forward communication to DTU",
+  "main": "lib/modbus-tcp-gateway.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "bin": {
+    "modbus-tcp-gateway": "bin/modbus-tcp-gateway"
+  },
+  "keywords": [
+    "modbus-tcp",
+    "gateway"
+  ],
+  "author": "Miroslav Dzurik",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dzurikmiroslav/modbus-tcp-gateway.git"
+  },
+  "dependencies": {
+    "commander": "^5.1.0"
+  },
+  "devDependencies": {
+    "mocha": "^7.1.2"
+  }
+}

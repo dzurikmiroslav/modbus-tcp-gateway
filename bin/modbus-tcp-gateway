@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+'use strict';
+
+const modbusTcpGateway = require('../lib/modbus-tcp-gateway');
+const program = require('commander');
+const pkg = require('../package.json');
+
+program
+    .version(pkg.version)
+    .usage('[options]')
+    .option('--modbus-host <value>', 'Modbus TCP host', '0.0.0.0')
+    .option('--modbus-port <value>', 'Modbus TCP port', parseInt, 10502)
+    .option('--dtu-host <value>', 'DTU host', '0.0.0.0')
+    .option('--dtu-port <value>', 'DTU port', parseInt, 11502)
+    .option('--dtu-code-pattern <value>', 'DTU registration code pattern, for example MAC address of DTU', '')
+    .option('--dtu-code-timeout <value>', 'DTU registration timeout (ms)', parseInt, 1000)
+    .option('--debug', 'Print communication packets')
+    .option('--from-env', 'Instead of options read environment variables (for example: --modbus-port is MODBUS_PORT)');
+
+program.on('--help', function () {
+    console.log('');
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ modbus-tcp-gateway --dtu-host 11.4.2.200 --modbus-port 502 --dtu-port 2000');
+    console.log('    $ modbus-tcp-gateway --dtu-code-pattern "7CA5D4033591"');
+    console.log('    $ modbus-tcp-gateway --dtu-code-pattern "7CA5D4033591 \\\\s+" --dtu-code-timeout 5000');
+    console.log('');
+});
+
+program.parse(process.argv);
+
+if (program.fromEnv) {
+    modbusTcpGateway({
+        modbusHost: process.env.MODBUS_HOST || '0.0.0.0',
+        modbusPort: parseInt(process.env.MODBUS_PORT || '10502'),
+        dtuHost: process.env.DTU_HOST || '0.0.0.0',
+        dtuPort: parseInt(process.env.DTU_PORT || '11502'),
+        dtuCodePattern: process.env.DTU_CODE_PATTERN || '',
+        dtuCodeTimeout: parseInt(process.env.DTU_CODE_TIMEOUT || '1000'),
+        debug: !!process.env.DEBUG
+    });
+} else {
+    modbusTcpGateway({
+        modbusHost: program.modbusHost || '0.0.0.0',
+        modbusPort: program.modbusPort || 10502,
+        dtuHost: program.dtuHost || '0.0.0.0',
+        dtuPort: program.dtuPort || 11502,
+        dtuCodePattern: program.dtuCodePattern,
+        dtuCodeTimeout: program.dtuCodeTimeout || 1000,
+        debug: program.debug
+    });
+}
