@@ -3,5 +3,7 @@ node_js:
   - "12"
   - "13"
   - "14"
+services:
+  - docker
 notifications:
   email: false
