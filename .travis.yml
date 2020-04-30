@@ -7,7 +7,7 @@ node_js:
 services:
   - docker
   
-deploy:
+before_install:
   - docker images
 
 notifications:
