@@ -20,7 +20,9 @@
     "url": "https://github.com/dzurikmiroslav/modbus-tcp-gateway.git"
   },
   "dependencies": {
-    "commander": "^5.1.0"
+    "commander": "^5.1.0",
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.0.0"
   },
   "devDependencies": {
     "mocha": "^7.1.2"

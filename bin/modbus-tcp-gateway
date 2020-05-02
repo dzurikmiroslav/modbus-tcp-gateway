@@ -5,15 +5,20 @@ const modbusTcpGateway = require('../lib/modbus-tcp-gateway');
 const program = require('commander');
 const pkg = require('../package.json');
 
+//TODO why parseInt directly not work?
 program
     .version(pkg.version)
     .usage('[options]')
     .option('--modbus-host <value>', 'Modbus TCP host', '0.0.0.0')
-    .option('--modbus-port <value>', 'Modbus TCP port', parseInt, 10502)
+    .option('--modbus-port <value>', 'Modbus TCP port', (val) => parseInt(val), 10502)
     .option('--dtu-host <value>', 'DTU host', '0.0.0.0')
-    .option('--dtu-port <value>', 'DTU port', parseInt, 11502)
+    .option('--dtu-port <value>', 'DTU port', (val) => parseInt(val), 11502)
     .option('--dtu-code-pattern <value>', 'DTU registration code pattern, for example MAC address of DTU', '')
-    .option('--dtu-code-timeout <value>', 'DTU registration timeout (ms)', parseInt, 1000)
+    .option('--dtu-code-timeout <number>', 'DTU registration timeout (ms)', (val) => parseInt(val), 1000)
+    .option('--dtu-encryption <value>', 'DTU encryption algorithm: \'aes\' \'des3\'', '')
+    .option('--dtu-encryption-key <value>', 'DTU encryption key', '')
+    .option('--dtu-encryption-iv <value>', 'DTU encryption initial vector', '')
+    .option('--dtu-response-timeout <number>', 'Request response timeout, after exceed return error packet (ms)', (val) => parseInt(val), 10000)
     .option('--debug', 'Print communication packets')
     .option('--from-env', 'Instead of options read environment variables (for example: --modbus-port is MODBUS_PORT)');
 
@@ -22,8 +27,8 @@ program.on('--help', function () {
     console.log('  Examples:');
     console.log('');
     console.log('    $ modbus-tcp-gateway --dtu-host 11.4.2.200 --modbus-port 502 --dtu-port 2000');
-    console.log('    $ modbus-tcp-gateway --dtu-code-pattern "7CA5D4033591"');
     console.log('    $ modbus-tcp-gateway --dtu-code-pattern "7CA5D4033591 \\\\s+" --dtu-code-timeout 5000');
+    console.log('    $ modbus-tcp-gateway --dtu-code-pattern "7CA5D4033591" --dtu-encryption aes-128-ecb --dtu-encryption-key 0000000000000000 --dtu-encryption-iv 0000000000000000');
     console.log('');
 });
 
@@ -37,16 +42,24 @@ if (program.fromEnv) {
         dtuPort: parseInt(process.env.DTU_PORT || '11502'),
         dtuCodePattern: process.env.DTU_CODE_PATTERN || '',
         dtuCodeTimeout: parseInt(process.env.DTU_CODE_TIMEOUT || '1000'),
+        dtuEncryption: process.env.DTU_ENCRYPTION || '',
+        dtuEncryptionKey: process.env.DTU_ENCRYPTION_KEY || '',
+        dtuEncryptionIv: process.env.DTU_ENCRYPTION_IV || '',
+        dtuResponseTimeout: parseInt(process.env.DTU_RESPONSE_TIMEOUT || '10000'),
         debug: !!process.env.DEBUG
     });
 } else {
     modbusTcpGateway({
-        modbusHost: program.modbusHost || '0.0.0.0',
-        modbusPort: program.modbusPort || 10502,
-        dtuHost: program.dtuHost || '0.0.0.0',
-        dtuPort: program.dtuPort || 11502,
+        modbusHost: program.modbusHost,
+        modbusPort: program.modbusPort,
+        dtuHost: program.dtuHost,
+        dtuPort: program.dtuPort,
         dtuCodePattern: program.dtuCodePattern,
-        dtuCodeTimeout: program.dtuCodeTimeout || 1000,
+        dtuCodeTimeout: program.dtuCodeTimeout,
+        dtuEncryption: program.dtuEncryption,
+        dtuEncryptionKey: program.dtuEncryptionKey,
+        dtuEncryptionIv: program.dtuEncryptionIv,
+        dtuResponseTimeout: program.dtuResponseTimeout,
         debug: program.debug
     });
 }
